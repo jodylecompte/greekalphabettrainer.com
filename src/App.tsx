@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { GREEK_LETTERS } from "./lib/letterData";
+import "./App.css";
 
 type Exercise = {
   prompt: string;
@@ -73,6 +74,14 @@ function generateExercise(): Exercise {
 export default function App() {
   const [exercise, setExercise] = useState(generateExercise());
   const [feedback, setFeedback] = useState<null | boolean>(null);
+  const [theme, setTheme] = useState<"light" | "dark">(
+    () => (localStorage.getItem("theme") as "light" | "dark") || "dark",
+  );
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
 
   function answer(choice: string) {
     const correct = choice === exercise.correct;
@@ -85,38 +94,51 @@ export default function App() {
   }
 
   return (
-    <div style={{ padding: 32, fontFamily: "system-ui" }}>
-      <div style={{ fontSize: 96, textAlign: "center" }}>{exercise.prompt}</div>
+    <div className="app">
+      <aside className="sidebar">
+        <h1>Greek Alphabet Trainer</h1>
 
-      <div style={{ marginTop: 32, display: "grid", gap: 12 }}>
-        {exercise.choices.map((choice) => (
-          <button
-            key={choice}
-            onClick={() => answer(choice)}
-            disabled={feedback !== null}
-            style={{
-              padding: 16,
-              fontSize: 20,
-              cursor: "pointer",
-            }}
-          >
-            {choice}
-          </button>
-        ))}
-      </div>
+        <p>
+          Learn to recognize and pronounce the Greek alphabet as it is commonly
+          taught in biblical and academic contexts.
+        </p>
 
-      {feedback !== null && (
-        <div
-          style={{
-            marginTop: 24,
-            fontSize: 24,
-            color: feedback ? "green" : "red",
-            textAlign: "center",
-          }}
+        <p>
+          Short, adaptive quizzes mix uppercase, lowercase, names, and
+          pronunciations so the letters actually stick.
+        </p>
+
+        <button
+          className="theme-toggle"
+          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
         >
-          {feedback ? "Correct" : `Correct answer: ${exercise.correct}`}
+          {theme === "dark" ? "Light mode" : "Dark mode"}
+        </button>
+      </aside>
+
+      <main className="quiz">
+        <div className="card">
+          <div className="prompt">{exercise.prompt}</div>
+
+          <div className="choices">
+            {exercise.choices.map((choice) => (
+              <button
+                key={choice}
+                onClick={() => answer(choice)}
+                disabled={feedback !== null}
+              >
+                {choice}
+              </button>
+            ))}
+          </div>
+
+          {feedback !== null && (
+            <div className={`feedback ${feedback ? "correct" : "incorrect"}`}>
+              {feedback ? "Correct" : `Correct answer: ${exercise.correct}`}
+            </div>
+          )}
         </div>
-      )}
+      </main>
     </div>
   );
 }
