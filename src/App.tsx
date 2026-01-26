@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import { GREEK_LETTERS } from "./lib/letterData";
+import { GREEK_LETTERS, type PronunciationMode } from "./lib/letterData";
+import * as Dialog from "@radix-ui/react-dialog";
 import "./App.css";
 
 type Exercise = {
   prompt: string;
   choices: string[];
   correct: string;
+  letterId: string;
 };
 
 function shuffle<T>(arr: T[]): T[] {
@@ -29,69 +31,134 @@ function randomCase(letter: { upper: string; lower: string }) {
 function glyphToName(): Exercise {
   const letter = pickRandomLetter();
   const prompt = randomCase(letter);
-
   const choices = shuffle([
     letter.name,
     ...pickDistractors(letter.id, (l) => l.name),
   ]);
-
-  return { prompt, choices, correct: letter.name };
+  return { prompt, choices, correct: letter.name, letterId: letter.id };
 }
 
 function nameToGlyph(): Exercise {
   const letter = pickRandomLetter();
   const correct = randomCase(letter);
-
   const choices = shuffle([
     correct,
     ...pickDistractors(letter.id, (l) => randomCase(l)),
   ]);
-
-  return { prompt: letter.name, choices, correct };
+  return { prompt: letter.name, choices, correct, letterId: letter.id };
 }
 
-function glyphToPronunciation(): Exercise {
+function glyphToPronunciation(mode: PronunciationMode): Exercise {
   const letter = pickRandomLetter();
   const prompt = randomCase(letter);
-
   const choices = shuffle([
-    letter.pronunciation,
-    ...pickDistractors(letter.id, (l) => l.pronunciation),
+    letter.pronunciations[mode],
+    ...pickDistractors(letter.id, (l) => l.pronunciations[mode]),
   ]);
-
-  return { prompt, choices, correct: letter.pronunciation };
-}
-
-const EXERCISE_FACTORIES = [glyphToName, nameToGlyph, glyphToPronunciation];
-
-function generateExercise(): Exercise {
-  const factory =
-    EXERCISE_FACTORIES[Math.floor(Math.random() * EXERCISE_FACTORIES.length)];
-
-  return factory();
+  return {
+    prompt,
+    choices,
+    correct: letter.pronunciations[mode],
+    letterId: letter.id,
+  };
 }
 
 export default function App() {
-  const [exercise, setExercise] = useState(generateExercise());
-  const [feedback, setFeedback] = useState<null | boolean>(null);
   const [theme, setTheme] = useState<"light" | "dark">(
     () => (localStorage.getItem("theme") as "light" | "dark") || "dark",
   );
+
+  const [pronunciationMode, setPronunciationMode] = useState<PronunciationMode>(
+    () =>
+      (localStorage.getItem("pronunciationMode") as PronunciationMode) ||
+      "erasmian",
+  );
+
+  const EXERCISE_FACTORIES = [
+    glyphToName,
+    nameToGlyph,
+    () => glyphToPronunciation(pronunciationMode),
+  ];
+
+  function generateExercise(): Exercise {
+    const factory =
+      EXERCISE_FACTORIES[Math.floor(Math.random() * EXERCISE_FACTORIES.length)];
+    return factory();
+  }
+
+  const [exercise, setExercise] = useState(generateExercise());
+  const [feedback, setFeedback] = useState<null | boolean>(null);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [needsAdvance, setNeedsAdvance] = useState(false);
+
+  const letter = GREEK_LETTERS.find((l) => l.id === exercise.letterId)!;
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("theme", theme);
   }, [theme]);
 
-  function answer(choice: string) {
-    const correct = choice === exercise.correct;
-    setFeedback(correct);
+  useEffect(() => {
+    localStorage.setItem("pronunciationMode", pronunciationMode);
 
-    setTimeout(() => {
+    // If current exercise is pronunciation-based, regenerate it
+    if (
+      exercise.correct === letter.pronunciations.erasmian ||
+      exercise.correct === letter.pronunciations.english ||
+      exercise.correct === letter.pronunciations.modern
+    ) {
       setExercise(generateExercise());
       setFeedback(null);
-    }, 600);
+      setSelected(null);
+      setNeedsAdvance(false);
+    }
+  }, [pronunciationMode]);
+
+  function nextExercise() {
+    setExercise(generateExercise());
+    setFeedback(null);
+    setSelected(null);
+    setNeedsAdvance(false);
   }
+
+  function answer(choice: string) {
+    const correct = choice === exercise.correct;
+    setSelected(choice);
+    setFeedback(correct);
+
+    if (correct) {
+      setTimeout(() => {
+        nextExercise();
+      }, 1500);
+    } else {
+      setNeedsAdvance(true);
+    }
+  }
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Enter") {
+        if (needsAdvance) {
+          nextExercise();
+          return;
+        }
+        if (selected !== null && feedback === null) {
+          answer(selected);
+          return;
+        }
+      }
+
+      if (feedback !== null) return;
+
+      const index = Number(e.key) - 1;
+      if (index >= 0 && index < exercise.choices.length) {
+        answer(exercise.choices[index]);
+      }
+    }
+
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [exercise, feedback, selected, needsAdvance]);
 
   return (
     <div className="app">
@@ -115,29 +182,97 @@ export default function App() {
         >
           {theme === "dark" ? "Light mode" : "Dark mode"}
         </button>
+
+        <div className="keyboard-hint">
+          ⌨️ Tip: Keyboard control equipped for number and enter keys
+        </div>
       </aside>
 
       <main className="quiz">
-        <div className="card">
+        <div className={`card ${feedback !== null ? "card-answered" : ""}`}>
+          <Dialog.Root>
+            <Dialog.Trigger asChild>
+              <button className="settings-button">⚙️</button>
+            </Dialog.Trigger>
+
+            <Dialog.Portal>
+              <Dialog.Overlay className="dialog-overlay" />
+              <Dialog.Content className="dialog-content">
+                <Dialog.Title className="dialog-title">
+                  Pronunciation
+                </Dialog.Title>
+
+                <select
+                  className="pronunciation-select"
+                  value={pronunciationMode}
+                  onChange={(e) =>
+                    setPronunciationMode(e.target.value as PronunciationMode)
+                  }
+                >
+                  <option value="erasmian">
+                    Erasmian (Biblical / Academic)
+                  </option>
+                  <option value="english">English / Math</option>
+                  <option value="modern">Modern Greek</option>
+                </select>
+
+                <Dialog.Close asChild>
+                  <button className="dialog-close">Done</button>
+                </Dialog.Close>
+              </Dialog.Content>
+            </Dialog.Portal>
+          </Dialog.Root>
+
           <div className="prompt">{exercise.prompt}</div>
 
           <div className="choices">
-            {exercise.choices.map((choice) => (
-              <button
-                key={choice}
-                onClick={() => answer(choice)}
-                disabled={feedback !== null}
-              >
-                {choice}
-              </button>
-            ))}
+            {exercise.choices.map((choice, i) => {
+              const state =
+                feedback === null
+                  ? ""
+                  : choice === exercise.correct
+                    ? "correct-choice"
+                    : choice === selected
+                      ? "incorrect-choice"
+                      : "";
+
+              return (
+                <button
+                  key={choice}
+                  className={state}
+                  onClick={() => answer(choice)}
+                  disabled={feedback !== null}
+                >
+                  <span className="choice-index">{i + 1}</span>
+                  <span className="choice-label">{choice}</span>
+                </button>
+              );
+            })}
           </div>
 
-          {feedback !== null && (
-            <div className={`feedback ${feedback ? "correct" : "incorrect"}`}>
-              {feedback ? "Correct" : `Correct answer: ${exercise.correct}`}
+          <div className={`reinforce ${feedback !== null ? "visible" : ""}`}>
+            <div className="reinforce-glyphs">
+              {letter.upper} {letter.lower}
             </div>
-          )}
+            <div className="reinforce-name">{letter.name}</div>
+            <div className="reinforce-pronunciation">
+              {letter.pronunciations[pronunciationMode]}
+            </div>
+          </div>
+
+          <button
+            className={`next-button ${needsAdvance ? "visible" : ""}`}
+            onClick={nextExercise}
+          >
+            Next →
+          </button>
+        </div>
+
+        <div className="attribution">
+          © {new Date().getFullYear()}{" "}
+          <a href="https://jodylecompte.com" target="_blank">
+            Jody LeCompte
+          </a>
         </div>
       </main>
     </div>
