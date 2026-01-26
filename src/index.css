@@ -251,20 +251,22 @@ button:disabled {
 }
 
 .attribution {
-  margin-top: 32px;
   font-size: 12px;
   color: var(--muted);
   text-align: center;
-  width: 100%;
+  width: 80%;
+  margin: 0 auto;
+  margin-top: 32px;
 }
 
 .attribution a {
-  color: inherit;
+  color: var(--accent);
   text-decoration: none;
+  border-bottom: 1px solid transparent;
 }
 
 .attribution a:hover {
-  text-decoration: underline;
+  border-bottom-color: var(--accent);
 }
 
 .next-button {
@@ -447,3 +449,4 @@ button {
     margin-top: 16px;
   }
 }
+

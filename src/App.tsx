@@ -3,6 +3,8 @@ import { GREEK_LETTERS, type PronunciationMode } from "./lib/letterData";
 import * as Dialog from "@radix-ui/react-dialog";
 import "./App.css";
 
+import { FaGear, FaKeyboard } from "react-icons/fa6";
+
 type Exercise = {
   prompt: string;
   choices: string[];
@@ -184,7 +186,8 @@ export default function App() {
         </button>
 
         <div className="keyboard-hint">
-          ⌨️ Tip: Keyboard control equipped for number and enter keys
+          <FaKeyboard /> Tip: Keyboard control equipped for number and enter
+          keys
         </div>
       </aside>
 
@@ -192,7 +195,9 @@ export default function App() {
         <div className={`card ${feedback !== null ? "card-answered" : ""}`}>
           <Dialog.Root>
             <Dialog.Trigger asChild>
-              <button className="settings-button">⚙️</button>
+              <button className="settings-button">
+                <FaGear />
+              </button>
             </Dialog.Trigger>
 
             <Dialog.Portal>
@@ -269,6 +274,19 @@ export default function App() {
         </div>
 
         <div className="attribution">
+          <p style={{ marginBottom: "20px" }}>
+            Adaptive quizes is a simple weighing of which questions you get
+            right and which you get wrong. All data is stored in your browser
+            and it's{" "}
+            <a href="https://github.com/jodylecompte/greekalphabettrainer.com">
+              entirely open source.
+            </a>
+          </p>
+          <p>
+            This site does't track you or use analytics. So if this blesses you
+            by helping you take the first step of learning Koine Greek, I'm
+            relying on you to let me know. ❤️
+          </p>
           © {new Date().getFullYear()}{" "}
           <a href="https://jodylecompte.com" target="_blank">
             Jody LeCompte
