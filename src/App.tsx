@@ -217,7 +217,7 @@ export default function App() {
                 </select>
 
                 <Dialog.Close asChild>
-                  <button className="dialog-close">Done</button>
+                  <button className="dialog-close">Save</button>
                 </Dialog.Close>
               </Dialog.Content>
             </Dialog.Portal>

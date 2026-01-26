@@ -121,8 +121,8 @@ body {
   display: grid;
   gap: 12px;
 }
-
 button {
+  position: relative;
   padding: 14px;
   font-size: 18px;
   background: var(--button);
@@ -131,6 +131,7 @@ button {
   cursor: pointer;
   color: var(--text);
 }
+
 
 button:hover {
   background: var(--button-hover);
@@ -152,78 +153,6 @@ button:disabled {
 
 .incorrect {
   color: #ef4444;
-}
-
-@media (max-width: 768px) {
-  .app {
-    grid-template-columns: 1fr;
-  }
-
-  .sidebar {
-    padding: 24px 16px 20px;
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-    gap: 14px;
-
-    align-items: center;
-    text-align: center;
-  }
-
-  .sidebar h1 {
-    font-size: 28px;
-    line-height: 1.2;
-    max-width: 320px;
-  }
-
-  .sidebar p {
-    font-size: 15px;
-    line-height: 1.5;
-    margin: 0;
-    max-width: 320px;
-  }
-
-  .sidebar p + p {
-    display: block;
-  }
-
-.theme-toggle {
-  margin-top: 6px;
-  padding: 6px 12px;
-  font-size: 14px;
-  align-self: center;
-}
-
-
-  .quiz {
-    padding: 16px;
-    align-items: flex-start;
-  }
-
-  .card {
-    width: 100%;
-    max-width: 100%;
-    padding: 28px 20px;
-    margin-top: 8px;
-  }
-
-  .prompt {
-    font-size: 64px;
-    margin-bottom: 24px;
-  }
-
-  .choices {
-    gap: 10px;
-  }
-
-  button {
-    font-size: 16px;
-    padding: 14px;
-  }
-
-  .feedback {
-    font-size: 16px;
-    margin-top: 16px;
-  }
 }
 
 
@@ -325,6 +254,8 @@ button:disabled {
   margin-top: 32px;
   font-size: 12px;
   color: var(--muted);
+  text-align: center;
+  width: 100%;
 }
 
 .attribution a {
@@ -382,8 +313,11 @@ button {
 }
 
 .choice-label {
-  flex: 1;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   text-align: center;
+  pointer-events: none;
 }
 
 .dialog-overlay {
@@ -440,4 +374,76 @@ button {
 
 .pronunciation-select:hover {
   background: var(--button-hover);
+}
+
+@media (max-width: 768px) {
+  .app {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    padding: 24px 16px 20px;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    gap: 14px;
+
+    align-items: center;
+    text-align: center;
+  }
+
+  .sidebar h1 {
+    font-size: 28px;
+    line-height: 1.2;
+    max-width: 320px;
+  }
+
+  .sidebar p {
+    font-size: 15px;
+    line-height: 1.5;
+    margin: 0;
+    max-width: 320px;
+  }
+
+  .sidebar p + p {
+    display: block;
+  }
+
+.theme-toggle {
+  margin-top: 6px;
+  padding: 6px 12px;
+  font-size: 14px;
+  align-self: center;
+}
+
+
+  .quiz {
+    padding: 16px;
+    align-items: flex-start;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 100%;
+    padding: 28px 20px;
+    margin-top: 8px;
+  }
+
+  .prompt {
+    font-size: 64px;
+    margin-bottom: 24px;
+  }
+
+  .choices {
+    gap: 10px;
+  }
+
+  button {
+    font-size: 16px;
+    padding: 14px;
+  }
+
+  .feedback {
+    font-size: 16px;
+    margin-top: 16px;
+  }
 }
