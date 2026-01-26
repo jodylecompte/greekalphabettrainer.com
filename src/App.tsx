@@ -1,69 +1,11 @@
 import { useEffect, useState } from "react";
-import { GREEK_LETTERS, type PronunciationMode } from "./lib/letterData";
 import * as Dialog from "@radix-ui/react-dialog";
-import "./App.css";
-
 import { FaGear, FaKeyboard } from "react-icons/fa6";
 
-type Exercise = {
-  prompt: string;
-  choices: string[];
-  correct: string;
-  letterId: string;
-};
+import { generateExercise, type Exercise } from "./lib/exercises";
+import { GREEK_LETTERS, type PronunciationMode } from "./lib/letterData";
 
-function shuffle<T>(arr: T[]): T[] {
-  return [...arr].sort(() => Math.random() - 0.5);
-}
-
-function pickRandomLetter() {
-  return GREEK_LETTERS[Math.floor(Math.random() * GREEK_LETTERS.length)];
-}
-
-function pickDistractors(correctId: string, map: (l: any) => string) {
-  return shuffle(
-    GREEK_LETTERS.filter((l) => l.id !== correctId).map(map),
-  ).slice(0, 3);
-}
-
-function randomCase(letter: { upper: string; lower: string }) {
-  return Math.random() < 0.5 ? letter.lower : letter.upper;
-}
-
-function glyphToName(): Exercise {
-  const letter = pickRandomLetter();
-  const prompt = randomCase(letter);
-  const choices = shuffle([
-    letter.name,
-    ...pickDistractors(letter.id, (l) => l.name),
-  ]);
-  return { prompt, choices, correct: letter.name, letterId: letter.id };
-}
-
-function nameToGlyph(): Exercise {
-  const letter = pickRandomLetter();
-  const correct = randomCase(letter);
-  const choices = shuffle([
-    correct,
-    ...pickDistractors(letter.id, (l) => randomCase(l)),
-  ]);
-  return { prompt: letter.name, choices, correct, letterId: letter.id };
-}
-
-function glyphToPronunciation(mode: PronunciationMode): Exercise {
-  const letter = pickRandomLetter();
-  const prompt = randomCase(letter);
-  const choices = shuffle([
-    letter.pronunciations[mode],
-    ...pickDistractors(letter.id, (l) => l.pronunciations[mode]),
-  ]);
-  return {
-    prompt,
-    choices,
-    correct: letter.pronunciations[mode],
-    letterId: letter.id,
-  };
-}
+import "./App.css";
 
 export default function App() {
   const [theme, setTheme] = useState<"light" | "dark">(
@@ -76,19 +18,10 @@ export default function App() {
       "erasmian",
   );
 
-  const EXERCISE_FACTORIES = [
-    glyphToName,
-    nameToGlyph,
-    () => glyphToPronunciation(pronunciationMode),
-  ];
+  const [exercise, setExercise] = useState<Exercise>(() =>
+    generateExercise(pronunciationMode),
+  );
 
-  function generateExercise(): Exercise {
-    const factory =
-      EXERCISE_FACTORIES[Math.floor(Math.random() * EXERCISE_FACTORIES.length)];
-    return factory();
-  }
-
-  const [exercise, setExercise] = useState(generateExercise());
   const [feedback, setFeedback] = useState<null | boolean>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [needsAdvance, setNeedsAdvance] = useState(false);
@@ -109,7 +42,7 @@ export default function App() {
       exercise.correct === letter.pronunciations.english ||
       exercise.correct === letter.pronunciations.modern
     ) {
-      setExercise(generateExercise());
+      setExercise(generateExercise(pronunciationMode));
       setFeedback(null);
       setSelected(null);
       setNeedsAdvance(false);
@@ -117,7 +50,7 @@ export default function App() {
   }, [pronunciationMode]);
 
   function nextExercise() {
-    setExercise(generateExercise());
+    setExercise(generateExercise(pronunciationMode));
     setFeedback(null);
     setSelected(null);
     setNeedsAdvance(false);
@@ -273,7 +206,7 @@ export default function App() {
           </button>
         </div>
 
-        <div className="attribution">
+        <div className="attribution" style={{ marginBottom: "10px" }}>
           <p style={{ marginBottom: "20px" }}>
             Adaptive quizes is a simple weighing of which questions you get
             right and which you get wrong. All data is stored in your browser
