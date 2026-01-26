@@ -282,13 +282,17 @@ export default function App() {
               entirely open source.
             </a>
           </p>
-          <p>
+          <p style={{ marginBottom: "10px" }}>
             This site does't track you or use analytics. So if this blesses you
             by helping you take the first step of learning Koine Greek, I'm
             relying on you to let me know. ❤️
           </p>
           © {new Date().getFullYear()}{" "}
-          <a href="https://jodylecompte.com" target="_blank">
+          <a
+            href="https://jodylecompte.com"
+            target="_blank"
+            style={{ marginBottom: "10px" }}
+          >
             Jody LeCompte
           </a>
         </div>
