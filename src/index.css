@@ -127,3 +127,74 @@ button:disabled {
 .incorrect {
   color: #ef4444;
 }
+
+@media (max-width: 768px) {
+  .app {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    padding: 24px 16px 20px;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    gap: 14px;
+
+    align-items: center;
+    text-align: center;
+  }
+
+  .sidebar h1 {
+    font-size: 28px;
+    line-height: 1.2;
+    max-width: 320px;
+  }
+
+  .sidebar p {
+    font-size: 15px;
+    line-height: 1.5;
+    margin: 0;
+    max-width: 320px;
+  }
+
+  .sidebar p + p {
+    display: none;
+  }
+
+  .theme-toggle {
+    margin-top: 6px;
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+
+  .quiz {
+    padding: 16px;
+    align-items: flex-start;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 100%;
+    padding: 28px 20px;
+    margin-top: 8px;
+  }
+
+  .prompt {
+    font-size: 64px;
+    margin-bottom: 24px;
+  }
+
+  .choices {
+    gap: 10px;
+  }
+
+  button {
+    font-size: 16px;
+    padding: 14px;
+  }
+
+  .feedback {
+    font-size: 16px;
+    margin-top: 16px;
+  }
+}
+
