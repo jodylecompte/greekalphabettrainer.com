@@ -57,7 +57,7 @@ body {
   font-size: 18px;
   line-height: 1.6;
   color: var(--muted);
-  max-width: 420px;
+  max-width: 520px;
 }
 
 .theme-toggle {
@@ -70,6 +70,7 @@ body {
   cursor: pointer;
   color: var(--muted);
 }
+
 
 .quiz {
   display: flex;
@@ -157,14 +158,16 @@ button:disabled {
   }
 
   .sidebar p + p {
-    display: none;
+    display: block;
   }
 
-  .theme-toggle {
-    margin-top: 6px;
-    padding: 6px 12px;
-    font-size: 14px;
-  }
+.theme-toggle {
+  margin-top: 6px;
+  padding: 6px 12px;
+  font-size: 14px;
+  align-self: center;
+}
+
 
   .quiz {
     padding: 16px;

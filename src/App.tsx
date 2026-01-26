@@ -99,13 +99,14 @@ export default function App() {
         <h1>Greek Alphabet Trainer</h1>
 
         <p>
-          Learn to recognize and pronounce the Greek alphabet as it is commonly
-          taught in biblical and academic contexts.
+          Learn to recognize and pronounce the Greek alphabet using short,
+          adaptive quizzes.
         </p>
 
         <p>
-          Short, adaptive quizzes mix uppercase, lowercase, names, and
-          pronunciations so the letters actually stick.
+          Spend just 5–10 minutes a day for a week or two and you’ll confidently
+          recognize both uppercase and lowercase letters as they appear in
+          biblical Greek texts.
         </p>
 
         <button
