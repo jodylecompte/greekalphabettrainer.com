@@ -18,20 +18,22 @@ export default function App() {
     <div className="grid grid-cols-1 md:grid-cols-2 min-h-screen md:h-screen md:overflow-hidden">
       <Sidebar theme={theme} onToggleTheme={toggleTheme} />
 
-      <main className="overflow-hidden md:h-full md:overflow-y-auto flex flex-col items-start md:items-center pt-4 md:pt-8 px-4 pb-4">
-        <QuizCard
-          exercise={exercise}
-          letter={letter}
-          pronunciationMode={pronunciationMode}
-          feedback={feedback}
-          selected={selected}
-          needsAdvance={needsAdvance}
-          onAnswer={handleAnswer}
-          onNext={resetExercise}
-          onPronunciationModeChange={setPronunciationMode}
-        />
+      <main className="overflow-hidden md:h-full md:overflow-y-auto flex flex-col items-start md:items-center md:justify-center pt-4 md:pt-0 px-4 pb-4 md:pb-0">
+        <div className="w-full md:w-auto flex flex-col items-center md:min-h-[630px] md:justify-center">
+          <QuizCard
+            exercise={exercise}
+            letter={letter}
+            pronunciationMode={pronunciationMode}
+            feedback={feedback}
+            selected={selected}
+            needsAdvance={needsAdvance}
+            onAnswer={handleAnswer}
+            onNext={resetExercise}
+            onPronunciationModeChange={setPronunciationMode}
+          />
 
-        <Footer />
+          <Footer />
+        </div>
       </main>
     </div>
   );
