@@ -58,7 +58,5 @@ export function useExercise(pronunciationMode: PronunciationMode) {
     needsAdvance,
     resetExercise,
     handleAnswer,
-    hasFeedback: feedback !== null,
-    showNextButton: needsAdvance,
   };
 }

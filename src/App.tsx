@@ -1,15 +1,9 @@
-import {
-  useExercise,
-  useKeyboardNavigation,
-  usePronunciationMode,
-  useTheme,
-} from "./hooks";
+import { usePronunciationMode, useQuiz, useTheme } from "./hooks";
 import { Footer, QuizCard, Sidebar } from "./components";
 
 export default function App() {
   const { theme, toggleTheme } = useTheme();
   const { pronunciationMode, setPronunciationMode } = usePronunciationMode();
-
   const {
     exercise,
     letter,
@@ -18,16 +12,7 @@ export default function App() {
     needsAdvance,
     resetExercise,
     handleAnswer,
-  } = useExercise(pronunciationMode);
-
-  useKeyboardNavigation({
-    choices: exercise.choices,
-    feedback,
-    selected,
-    needsAdvance,
-    onAnswer: handleAnswer,
-    onNext: resetExercise,
-  });
+  } = useQuiz(pronunciationMode);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 min-h-screen md:h-screen md:overflow-hidden">
