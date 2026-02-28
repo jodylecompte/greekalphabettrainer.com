@@ -11,7 +11,8 @@ const BASE_CLASSES =
   "relative px-3 py-2.5 text-sm md:text-base bg-[var(--button)] border border-[var(--border)] rounded-[10px] cursor-pointer text-[var(--text)] hover:bg-[var(--button-hover)] transition-colors flex items-center gap-3 disabled:opacity-60 disabled:cursor-default";
 
 function getButtonClassName(isCorrect: boolean, isIncorrect: boolean): string {
-  if (isCorrect) return `${BASE_CLASSES} border-green-500 bg-green-500/15`;
+  if (isCorrect)
+    return `${BASE_CLASSES} border-green-500 bg-green-500/15 animate-correct`;
   if (isIncorrect) return `${BASE_CLASSES} border-red-500 bg-red-500/15`;
   return BASE_CLASSES;
 }

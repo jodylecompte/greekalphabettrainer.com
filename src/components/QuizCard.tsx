@@ -1,7 +1,10 @@
+import { useEffect, useRef, useState } from "react";
 import type { Exercise } from "../lib/exercises";
 import type { GreekLetter, PronunciationMode } from "../lib/letterData";
 import { AnswerReinforcement } from "./AnswerReinforcement";
 import { ChoiceButton } from "./ChoiceButton";
+import { GlyphGrid } from "./GlyphGrid";
+import { SessionStats } from "./SessionStats";
 import { SettingsDialog } from "./SettingsDialog";
 
 type QuizCardProps = {
@@ -14,6 +17,16 @@ type QuizCardProps = {
   onAnswer: (choice: string) => void;
   onNext: () => void;
   onPronunciationModeChange: (mode: PronunciationMode) => void;
+  // Phase 3
+  streak: number;
+  totalAnswered: number;
+  totalCorrect: number;
+  // Phase 7
+  hasToughLetters: boolean;
+  focusMode: boolean;
+  onSetFocusMode: (v: boolean) => void;
+  toughLetterIds: string[];
+  onClearToughLetters: () => void;
 };
 
 export function QuizCard({
@@ -26,8 +39,39 @@ export function QuizCard({
   onAnswer,
   onNext,
   onPronunciationModeChange,
+  streak,
+  totalAnswered,
+  totalCorrect,
+  hasToughLetters,
+  focusMode,
+  onSetFocusMode,
+  toughLetterIds,
+  onClearToughLetters,
 }: QuizCardProps) {
   const hasFeedback = feedback !== null;
+  const accuracy =
+    totalAnswered > 0 ? Math.round((totalCorrect / totalAnswered) * 100) : 0;
+
+  // Phase 2: keyboard hint — show until 3 digit key presses
+  const [showKeyHint, setShowKeyHint] = useState(true);
+  const keyPressCount = useRef(0);
+
+  useEffect(() => {
+    if (!showKeyHint) return;
+
+    const handler = (e: KeyboardEvent) => {
+      const num = Number(e.key);
+      if (num >= 1 && num <= 4) {
+        keyPressCount.current += 1;
+        if (keyPressCount.current >= 3) {
+          setShowKeyHint(false);
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [showKeyHint]);
 
   return (
     <div
@@ -44,27 +88,71 @@ export function QuizCard({
         {exercise.prompt}
       </div>
 
-      <div className="grid gap-2 md:gap-2.5">
-        {exercise.choices.map((choice, index) => {
-          const isCorrect = hasFeedback && choice === exercise.correct;
-          const isIncorrect =
-            hasFeedback &&
-            choice === selected &&
-            choice !== exercise.correct;
+      {/* Phase 3: session stats */}
+      <SessionStats streak={streak} accuracy={accuracy} total={totalAnswered} />
 
-          return (
-            <ChoiceButton
-              key={choice}
-              choice={choice}
-              index={index}
-              isCorrect={isCorrect}
-              isIncorrect={isIncorrect}
-              isDisabled={hasFeedback}
-              onSelect={() => onAnswer(choice)}
-            />
-          );
-        })}
-      </div>
+      {/* Phase 7: focus mode controls */}
+      {hasToughLetters && (
+        <div className="flex items-center justify-center gap-2 mb-3">
+          {!focusMode ? (
+            <button
+              onClick={() => onSetFocusMode(true)}
+              type="button"
+              className="text-xs px-2.5 py-1 rounded-full border border-[var(--border)] text-[var(--muted)] hover:text-[var(--text)] hover:border-[var(--accent)] transition-colors cursor-pointer"
+            >
+              Focus Practice ({toughLetterIds.length}{" "}
+              {toughLetterIds.length === 1 ? "letter" : "letters"})
+            </button>
+          ) : (
+            <>
+              <span className="text-xs text-amber-500 font-medium">
+                Focus Mode — {toughLetterIds.length}{" "}
+                {toughLetterIds.length === 1 ? "letter" : "letters"}
+              </span>
+              <button
+                onClick={onClearToughLetters}
+                type="button"
+                className="text-xs px-2 py-0.5 rounded border border-[var(--border)] text-[var(--muted)] hover:text-[var(--text)] transition-colors cursor-pointer"
+              >
+                Clear
+              </button>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Phase 6: glyph grid vs standard choice list */}
+      {exercise.variant === "glyph-grid" ? (
+        <GlyphGrid
+          choices={exercise.choices}
+          correct={exercise.correct}
+          selected={selected}
+          hasFeedback={hasFeedback}
+          onSelect={onAnswer}
+        />
+      ) : (
+        <div className="grid gap-2 md:gap-2.5">
+          {exercise.choices.map((choice, index) => {
+            const isCorrect = hasFeedback && choice === exercise.correct;
+            const isIncorrect =
+              hasFeedback &&
+              choice === selected &&
+              choice !== exercise.correct;
+
+            return (
+              <ChoiceButton
+                key={choice}
+                choice={choice}
+                index={index}
+                isCorrect={isCorrect}
+                isIncorrect={isIncorrect}
+                isDisabled={hasFeedback}
+                onSelect={() => onAnswer(choice)}
+              />
+            );
+          })}
+        </div>
+      )}
 
       <AnswerReinforcement
         letter={letter}
@@ -81,6 +169,15 @@ export function QuizCard({
       >
         Next →
       </button>
+
+      {/* Phase 2: keyboard hint pill */}
+      <div
+        className={`mt-2 text-xs text-[var(--muted)] transition-opacity duration-500 ${
+          showKeyHint ? "opacity-60" : "opacity-0 pointer-events-none"
+        }`}
+      >
+        Tip: use keys 1–4
+      </div>
     </div>
   );
 }

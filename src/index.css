@@ -28,6 +28,16 @@
   --next-text: #f5f5f7;
 }
 
+@keyframes correctPulse {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+
+.animate-correct {
+  animation: correctPulse 0.4s ease-out 1;
+}
+
 * {
   box-sizing: border-box;
 }
