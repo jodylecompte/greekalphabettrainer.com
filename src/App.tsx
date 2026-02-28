@@ -12,6 +12,14 @@ export default function App() {
     needsAdvance,
     resetExercise,
     handleAnswer,
+    streak,
+    totalAnswered,
+    totalCorrect,
+    focusMode,
+    setFocusMode,
+    toughLetterIds,
+    hasToughLetters,
+    clearToughLetters,
   } = useQuiz(pronunciationMode);
 
   return (
@@ -30,6 +38,14 @@ export default function App() {
             onAnswer={handleAnswer}
             onNext={resetExercise}
             onPronunciationModeChange={setPronunciationMode}
+            streak={streak}
+            totalAnswered={totalAnswered}
+            totalCorrect={totalCorrect}
+            hasToughLetters={hasToughLetters}
+            focusMode={focusMode}
+            onSetFocusMode={setFocusMode}
+            toughLetterIds={toughLetterIds}
+            onClearToughLetters={clearToughLetters}
           />
 
           <Footer />
