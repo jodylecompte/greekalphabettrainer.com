@@ -45,10 +45,29 @@ The dev server starts at `http://localhost:5173`.
 ### Other commands
 
 ```bash
-npm run build    # Production build (output in dist/)
-npm run preview  # Preview the production build locally
-npm run lint     # Run ESLint
+npm run build         # Production build (output in dist/)
+npm run preview       # Preview the production build locally
+npm run lint          # Run ESLint
+npm run test          # Run tests in watch mode
+npm run test:coverage # Run tests once and report coverage
 ```
+
+### Testing
+
+Tests are written with [Vitest](https://vitest.dev/) and [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/).
+
+Test files live alongside the code they test in `__tests__/` subdirectories:
+
+```
+src/
+├── lib/__tests__/
+│   ├── letterData.test.ts    # Letter data shape and integrity
+│   └── exercises.test.ts     # Exercise factory logic
+├── hooks/__tests__/          # Custom hook tests (renderHook)
+└── components/__tests__/     # Component tests (render + userEvent)
+```
+
+Coverage is enforced at 100% for all source files (excluding `main.tsx`).
 
 ### Project structure
 
