@@ -117,42 +117,6 @@ function phoneticSpelling(
   };
 }
 
-// Phase 5: show prev ___ next, pick the middle letter glyph
-function alphabetSequence(allowedIds?: string[]): Exercise {
-  let validIndices = Array.from(
-    { length: GREEK_LETTERS.length - 2 },
-    (_, i) => i + 1,
-  );
-
-  if (allowedIds && allowedIds.length > 0) {
-    const filtered = validIndices.filter((i) =>
-      allowedIds.includes(GREEK_LETTERS[i].id),
-    );
-    if (filtered.length > 0) validIndices = filtered;
-  }
-
-  const i = validIndices[Math.floor(Math.random() * validIndices.length)];
-  const prev = GREEK_LETTERS[i - 1];
-  const target = GREEK_LETTERS[i];
-  const next = GREEK_LETTERS[i + 1];
-
-  const correct = randomCase(target);
-  const prompt = `${randomCase(prev)} ___ ${randomCase(next)}`;
-
-  const distractors = shuffle(
-    GREEK_LETTERS.filter(
-      (l) => l.id !== prev.id && l.id !== target.id && l.id !== next.id,
-    ).map((l) => randomCase(l)),
-  ).slice(0, 3);
-
-  return {
-    prompt,
-    choices: shuffle([correct, ...distractors]),
-    correct,
-    letterId: target.id,
-  };
-}
-
 // Phase 6: name shown, pick from a 2×2 large glyph grid
 function spotTheGlyph(letterPool = GREEK_LETTERS): Exercise {
   const exercise = nameToGlyph(letterPool);
@@ -176,7 +140,6 @@ export function generateExercise(
     () => glyphToPronunciation(pronunciationMode, safePool),
     () => nameToPronunciation(pronunciationMode, safePool),
     () => phoneticSpelling(pronunciationMode, safePool),
-    () => alphabetSequence(allowedIds),
     () => spotTheGlyph(safePool),
   ];
 
